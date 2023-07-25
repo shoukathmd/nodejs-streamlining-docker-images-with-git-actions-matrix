@@ -12,9 +12,9 @@ jobs:
       matrix:
         include:
           - dockerfile: ./docker/Dockerfile1
-            tags: ghcr.io/sample-app:fe
+            tags: ghcr.io/shoukathmd/sample-app:fe
           - dockerfile: ./docker/Dockerfile2
-            tags: ghcr.io/perfai-inc/sample-app:be
+            tags: ghcr.io/shoukathmd/sample-app:be
 
     permissions:
       contents: read
