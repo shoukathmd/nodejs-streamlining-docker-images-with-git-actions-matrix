@@ -1,0 +1,47 @@
+name: Create and publish a Docker image
+
+on: 
+  push:
+    branches: ['main']
+
+jobs:
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - dockerfile: ./docker/Dockerfile1
+            tags: ghcr.io/sample-app:fe
+          - dockerfile: ./docker/Dockerfile2
+            tags: ghcr.io/perfai-inc/sample-app:be
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+                 
+      - name: Log in to the Container registry
+        uses: docker/login-action@2
+        with:
+          registry: ${{ vars.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@2
+        with:
+           images: ${{ vars.REGISTRY }}/${{ vars.IMAGE_NAME }}
+       
+      - name: Build and push Docker image
+        uses: docker/build-push-action@2
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          push: true
+          tags: ${{ matrix.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
